@@ -1,64 +1,42 @@
-# Zemel-et-al.-2013-Learning-Fair-Representations-
-Reproduction of Zemel, et al. ["Learning Fair Representations"](http://proceedings.mlr.press/v28/zemel13.pdf), ICML 2013
-The code take inspiration from two repositories.
-- The author repo: https://github.com/zjelveh/learning-fair-representations
-- AIF360 repo: https://github.com/Trusted-AI/AIF360/blob/master/aif360/algorithms/preprocessing/lfr.py
+[My_implementation_README.md](https://github.com/user-attachments/files/34858589/My_implementation_README.md)
+1. little adjustments:
+- removed numba and llvmlite from reqs, too outdated
+- updated their versions to 0.60.0 and 0.43.0
+- removed  .decorators function from numba in utils.py
+- imported csv
+- import numpy as np
+- import pandas as pd
 
-The idea was to reproduce part of the experiment proposed in the article since no guidelines are available in both the repositories, and different problems trying to reproduce the article with both the repo.
-In the litterature, this is considered as a PRE-PROCESSING fair representation algorithm. However, the authors propose LFR as both a PRE and IN-PROCESSING algorithm.
-Zemel, et al. use different not usual metrics:
-- <img src="https://latex.codecogs.com/svg.image?yACC=1-\frac{1}{2}\sum_{n=1}^{N}&space;\mid&space;y_n&space;-&space;\hat{y}_n&space;\mid" title="yACC=1-\frac{1}{N}\sum_{n=1}^{N} \mid y_n - \hat{y}_n \mid" />
-- <img src="https://latex.codecogs.com/svg.image?yDiscrim&space;=&space;\mid&space;\frac{\sum_{n:s_n=1}\hat{y}_n}{\sum_{n:s_n=1}1}&space;-&space;\frac{\sum_{n:s_n=0}\hat{y}_n}{\sum_{n:s_n=0}1}&space;\mid" title="yDiscrim = \mid \frac{\sum_{n:s_n=1}\hat{y}_n}{\sum_{n:s_n=1}1} - \frac{\sum_{n:s_n=0}\hat{y}_n}{\sum_{n:s_n=0}1} \mid" />
-- <img src="https://latex.codecogs.com/svg.image?yNN&space;=&space;1&space;-&space;\frac{1}{Nk}\sum_{n=1}^{N}&space;\mid&space;\hat{y}_n&space;-&space;\sum_{j&space;\in&space;kNN(x_n)}&space;\hat{y}_j&space;\mid" title="yNN = 1 - \frac{1}{Nk}\sum_{n=1}^{N} \mid \hat{y}_n - \sum_{j \in kNN(x_n)} \hat{y}_j \mid" />
+2. The script does not calculate the parity difference (DP_Diff),
+the disparate impact ratio (DIR), and the consistency
+from the original labels of the dataset before mitigation. So I had
+to implement that in the code. The python codes calc_German.py,
+calc_adult.py and calc_COMPAS.py show how I made those functions, before
+implementing them in the main.py. I did not add the Compass dataset into
+the dataloader() function in the main.py, because I did not understand
+how to correclty implement that dataset. Although I did make the
+function that calculates the parity difference, the disparate impact
+ratio and the consistency of the Compass dataset.
 
-Following, the metrics used in the plots proposed by myself:
-- <img src="https://latex.codecogs.com/svg.image?ACC&space;=&space;\frac{TP&plus;TN}{TP&plus;TN&plus;FP&plus;FN}" title="ACC = \frac{TP+TN}{TP+TN+FP+FN}" />
-- <img src="https://latex.codecogs.com/svg.image?DEO&space;=&space;\mid&space;TPrate_{privileged}&space;-&space;TPrate_{unprivileged}&space;\mid" title="DEO = \mid TPrate_{privileged} - TPrate_{unprivileged} \mid" />
-- <img src="https://latex.codecogs.com/svg.image?DAO&space;=&space;\frac{\mid&space;FPrate_{privileged}-&space;FPrate_{unprivileged}\mid&plus;\mid&space;TPrate_{privileged}-TPrate_{unprivileged}\mid}{2}" title="DAO = \frac{\mid FPrate_{privileged}- FPrate_{unprivileged}\mid+\mid TPrate_{privileged}-TPrate_{unprivileged}\mid}{2}" />
-- <img src="https://latex.codecogs.com/svg.image?F\_DEO&space;=&space;ACC\times(1-DEO)" title="F\_DEO = ACC\times(1-DEO)" />
-- <img src="https://latex.codecogs.com/svg.image?F\_DAO&space;=&space;ACC\times(1-DAO)" title="F\_DAO = ACC\times(1-DAO)" />
+3. I implemented 3 if-functions in main.py that
+call the correct function for the chosen dataset.
 
-### Installation guidelines:
-Following, the instruction to install the correct packages for running the experiments (numba==0.48.0 is mandatory)
+4. Because I am using the calculation functions in three different
+processes, I put the value "process" as an argument, containing numbers
+1-3, representing in which process the calculation is being used
+(whole data before mitigation, y_test before mitigation,
+y_test after mitigation).
 
-```bash
-$ python3 -m venv venv_lfr
-$ source venv_lfr/bin/activate
-$ pip install --upgrade pip
-$ pip install -r requirements.txt
-```
 
-### Training and test the model
-To train and evaluate LFR with all the metrics, you may run the following command:
+5. Implementation scripts: 
+- calc_German.py
+- calc_adult.py
+- calc_COMPAS.py
 
-```bash
-$ python -u main.py
-```
-or run the personilized dataset, changing LINE 19 & 20 ("sensitive_features" and "dataset") and the "dataloader" of main.py script with an IDE or with `sudo nano main.py`
-### Results
+6. The whole pipeline can be run by simply running Pipeline.ipynb.
+Before doing that, project syncing needs to be done.
+and also at least install the following packages:
+- all packages from requirements.txt
 
-Following the graphics of train and test at various thresholds for different metrics (Accuracy, Difference in Equal Opportunity, Difference in Averages Odds, Fair_DEO==ACC*(1-DEO), Fair_DAO==ACC*(1-DAO)) and both German and Adult.
-The plot show the accuracy-fairness trade-off at various thresholdes for the generated(or predicted) y_hat.
-
-- GERMAN dataset
-
-![image](https://user-images.githubusercontent.com/60853532/155762802-7fa20e15-c4be-4bf2-96be-45a0dbea9f04.png)
-!![image](https://user-images.githubusercontent.com/60853532/155762857-10f37c20-ef0e-4ed2-a64c-9dc8a2550d91.png)
-
-```
-Next the metrics used by Zemel, et al. on the Test set
-Accuracy: 0.6702218787753681
-Discrimination: 0.03959704798033192
-Consistency: 0.4259762244816738
-```
-- ADULT dataset
-
-![image](https://user-images.githubusercontent.com/60853532/155762889-0200d172-98b3-4c26-bf0c-e9525aec5c58.png)
-![image](https://user-images.githubusercontent.com/60853532/155762913-be6f2490-e515-4c40-8fb5-7b957cd6410b.png)
-
-```
-Next the metrics used by Zemel, et al. on the Test set
-Accuracy: 0.6303079728728369
-Discrimination: 0.001884131225272645
-Consistency: 0.7975905194197657
-```
+It can happen that it will show an error, then in terminal run:
+python -m pip install --upgrade "matplotlib>=3.7,<3.10" "matplotlib-inline>=0.1.7,<0.2"
