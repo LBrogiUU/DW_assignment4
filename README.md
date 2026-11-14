@@ -1,4 +1,3 @@
-[My_implementation_README.md](https://github.com/user-attachments/files/34858589/My_implementation_README.md)
 1. little adjustments:
 - removed numba and llvmlite from reqs, too outdated
 - updated their versions to 0.60.0 and 0.43.0
@@ -35,8 +34,8 @@ y_test after mitigation).
 
 6. The whole pipeline can be run by simply running Pipeline.ipynb.
 Before doing that, project syncing needs to be done.
-and also at least install the following packages:
-- all packages from requirements.txt
+also:
+- install all packages from requirements.txt
 
 It can happen that it will show an error, then in terminal run:
 python -m pip install --upgrade "matplotlib>=3.7,<3.10" "matplotlib-inline>=0.1.7,<0.2"
